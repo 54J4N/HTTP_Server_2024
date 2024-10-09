@@ -9,7 +9,7 @@ const dataFilePath = path.join(__dirname, "data.json");
 
 app.use(express.json());
 
-// Read data from file
+// Read  data from file
 function readData() {
     if (!fs.existsSync(dataFilePath)) {
         return [];
@@ -18,12 +18,12 @@ function readData() {
     return JSON.parse(data);
 }
 
-// Write data to file
+// Wrt data to file
 function writeData(data) {
     fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 }
 
-// POST - Add a new name
+// POST - This will Add a new name
 app.post("/api/names", (req, res) => {
     const { name } = req.body;
 
@@ -40,7 +40,7 @@ app.post("/api/names", (req, res) => {
     res.status(201).json(newEntry);
 });
 
-// PATCH - Update a name by ID
+// PATCH - This will Update a name by ID
 app.patch("/api/names/:id", (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
@@ -61,7 +61,7 @@ app.patch("/api/names/:id", (req, res) => {
     }
 });
 
-// DELETE - Remove a name by ID
+// DELETE - This will Remove a name by ID
 app.delete("/api/names/:id", (req, res) => {
     const { id } = req.params;
 
@@ -76,7 +76,7 @@ app.delete("/api/names/:id", (req, res) => {
     }
 });
 
-// GET - Retrieve all names or search by name
+// GET - This Retrieve all names or search by name
 app.get("/api/names", (req, res) => {
     const { name } = req.query; // Get query parameter
     const data = readData();
@@ -89,7 +89,7 @@ app.get("/api/names", (req, res) => {
     res.json(data);
 });
 
-// GET - Retrieve a name by ID
+// GET - This Retrieve a name by ID
 app.get("/api/names/:id", (req, res) => {
     const { id } = req.params;
     const data = readData();
