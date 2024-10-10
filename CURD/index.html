@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple CRUD App</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Simple CRUD Application</h1>
+    <form id="dataForm">
+        <input type="text" id="name" placeholder="Enter name" required>
+        <button type="submit">Add Item</button>
+    </form>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        const form = document.getElementById('dataForm');
+        const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+
+        // Fetch and display data
+        function fetchData() {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    dataTable.innerHTML = ''; // Clear existing rows
+                    data.forEach((item, index) => {
+                        const row = dataTable.insertRow();
+                        row.insertCell(0).textContent = item.name;
+                        row.insertCell(1).innerHTML = `
+                            <button onclick="editItem(${index})">Edit</button>
+                            <button onclick="deleteItem(${index})">Delete</button>
+                        `;
+                    });
+                });
+        }
+
+        // Add or edit item
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+
+            // Determine if it's an update or new item
+            const editIndex = document.getElementById('editIndex')?.value;
+            const method = editIndex ? 'PATCH' : 'POST';
+            const body = editIndex
+                ? JSON.stringify({ index: editIndex, data: { name } })
+                : JSON.stringify({ name });
+
+            fetch('/api/data', {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body
+            }).then(fetchData);
+
+            form.reset();
+        });
+
+        // Edit item
+        function editItem(index) {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    const item = data[index];
+                    document.getElementById('name').value = item.name;
+                    document.getElementById('editIndex').value = index; // Store index for editing
+                });
+        }
+
+        // Delete item
+        function deleteItem(index) {
+            fetch('/api/data', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ index })
+            }).then(fetchData);
+        }
+
+        // Initial fetch
+        fetchData();
+    </script>
+</body>
+
+</html>
